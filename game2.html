@@ -35,6 +35,9 @@
       const shapes = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍋‍🟩"];
       const cards = [];
 
+      let matchCount = 0;
+      let animating = false;
+
       let openIndex1 = -1;
       let openIndex2 = -1;
 
@@ -66,33 +69,49 @@
       }
       startGame();
       function reveal(index) {
-        const card = document.getElementById(`card${index}`);
-        card.classList.add("card-open");
+        if (!animating) {
+          const card = document.getElementById(`card${index}`);
+          card.classList.add("card-open");
 
-        if (openIndex1 == -1) {
-          openIndex1 = index;
-        } else {
-          openIndex2 = index;
-          if (cards[openIndex1] == cards[openIndex2]) {
-            console.log("same");
-            openIndex1 = -1;
-            openIndex2 = -1;
+          if (openIndex1 == -1) {
+            openIndex1 = index;
           } else {
-            console.log("diff");
-            setTimeout(function () {
-              document
-                .getElementById(`card${openIndex1}`)
-                .classList.remove("card-open");
-              document
-                .getElementById(`card${openIndex2}`)
-                .classList.remove("card-open");
+            if (openIndex1 === index) {
+              openIndex2 = index;
+              if (cards[openIndex1] == cards[openIndex2]) {
+                console.log("same");
+                matchCount++;
+                document
+                  .getElementById(`card${openIndex1}`)
+                  .classList.remove("card-matched");
+                document
+                  .getElementById(`card${openIndex2}`)
+                  .classList.remove("card-matched");
+                openIndex1 = -1;
+                openIndex2 = -1;
+                if (matchCount === shapes.length) {
+                  alert("Good job");
+                }
+              } else {
+                console.log("diff");
+                animating = true;
+                setTimeout(function () {
+                  document
+                    .getElementById(`card${openIndex1}`)
+                    .classList.remove("card-open");
+                  document
+                    .getElementById(`card${openIndex2}`)
+                    .classList.remove("card-open");
 
-              openIndex1 = -1;
-              openIndex2 = -1;
-            }, 1000);
+                  openIndex1 = -1;
+                  openIndex2 = -1;
+                  animating = false;
+                }, 1000);
+              }
+
+              console.log(openIndex1, openIndex2);
+            }
           }
-
-          console.log(openIndex1, openIndex2);
         }
       }
     </script>
