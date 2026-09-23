@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" style="background-color: rgb(85, 17, 80)">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>card game</title>
+  </head>
+  <style>
+    .card {
+      height: 300px;
+      width: 200px;
+      border-radius: 20px;
+      background-color: purple;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: transparent;
+      font-size: 80px;
+      transition: all 1s;
+    }
+    .card-open {
+      color: white;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      width: 860px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+  </style>
+  <body>
+    <div class="container" id="container"></div>
+    <script>
+      const shapes = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍋‍🟩"];
+      const cards = [];
+
+      let openIndex1 = -1;
+      let openIndex2 = -1;
+
+      for (let i = 0; i < shapes.length; i++) {
+        cards.push(shapes[i]);
+        cards.push(shapes[i]);
+      }
+      function shuffle(array) {
+        let currentIndex = array.length;
+
+        while (currentIndex != 0) {
+          let randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex],
+            array[currentIndex],
+          ];
+        }
+      }
+      shuffle(cards);
+      console.log(cards);
+      function startGame() {
+        let result = "";
+        for (let i = 0; i < cards.length; i++) {
+          result += `<div class="card" id="card${i}" onclick="reveal(${i})">${cards[i]}</div>`;
+        }
+        document.getElementById("container").innerHTML = result;
+      }
+      startGame();
+      function reveal(index) {
+        const card = document.getElementById(`card${index}`);
+        card.classList.add("card-open");
+
+        if (openIndex1 == -1) {
+          openIndex1 = index;
+        } else {
+          openIndex2 = index;
+          if (cards[openIndex1] == cards[openIndex2]) {
+            console.log("same");
+            openIndex1 = -1;
+            openIndex2 = -1;
+          } else {
+            console.log("diff");
+            setTimeout(function () {
+              document
+                .getElementById(`card${openIndex1}`)
+                .classList.remove("card-open");
+              document
+                .getElementById(`card${openIndex2}`)
+                .classList.remove("card-open");
+
+              openIndex1 = -1;
+              openIndex2 = -1;
+            }, 1000);
+          }
+
+          console.log(openIndex1, openIndex2);
+        }
+      }
+    </script>
+  </body>
+</html>

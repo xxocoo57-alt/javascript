@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Цэцэгтэй Тоглоом</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css"
+    />
+    <style>
+      body {
+        padding: 20px;
+        font-family: sans-serif;
+      }
+      .board {
+        background-image: url(https://i.pinimg.com/564x/f0/d4/13/f0d4135557467b85d1e036cbe844d954.jpg);
+        background-size: cover;
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .player,
+      .flower {
+        width: 20px;
+        height: 20px;
+        font-size: 16px;
+        line-height: 20px;
+        text-align: center;
+        position: absolute;
+        transition: all 0.05s linear;
+      }
+      .stats-panel {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .controls {
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="stats-panel">
+      <div>Оноо: <span id="score">0</span> 🌼</div>
+      <div>Үлдсэн хугацаа: <span id="timer">60</span>s ⏱️</div>
+    </div>
+
+    <div id="board" class="board">
+      <div id="player" class="player">🦋</div>
+
+      <div id="flower1" class="flower">🌼</div>
+      <div id="flower2" class="flower">🌼</div>
+      <div id="flower3" class="flower">🌼</div>
+    </div>
+
+    <div class="controls">
+      <button class="button is-info" onclick="moveLeft()">Left</button>
+      <button class="button is-info" onclick="moveUp()">Up</button>
+      <button class="button is-info" onclick="moveDown()">Down</button>
+      <button class="button is-info" onclick="moveRight()">Right</button>
+      <button class="button is-success ml-3" onclick="startGame()">
+        Шинээр эхлэх
+      </button>
+    </div>
+
+    <script>
+      let playerX = 10;
+      let playerY = 20;
+
+      let flowers = [
+        { id: "flower1", x: 0, y: 0 },
+        { id: "flower2", x: 0, y: 0 },
+        { id: "flower3", x: 0, y: 0 },
+      ];
+
+      let score = 0;
+      let timeLeft = 60;
+      let gameInterval = null;
+      let isGameOver = false;
+
+      const step = 10;
+      const boardHeight = 300;
+      const boardWidth = 400;
+
+      const boardEl = document.getElementById("board");
+      const playerEl = document.getElementById("player");
+      const scoreEl = document.getElementById("score");
+      const timerEl = document.getElementById("timer");
+
+      boardEl.style.width = `${boardWidth}px`;
+      boardEl.style.height = `${boardHeight}px`;
+
+      function startGame() {
+        score = 0;
+        timeLeft = 60;
+        isGameOver = false;
+        playerX = 10;
+        playerY = 20;
+        scoreEl.innerText = score;
+        timerEl.innerText = timeLeft;
+
+        flowers.forEach((flower) => spawnFlower(flower));
+        draw();
+
+        if (gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(updateTimer, 1000);
+      }
+
+      function updateTimer() {
+        timeLeft--;
+        timerEl.innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(gameInterval);
+          isGameOver = true;
+          alert(`Цаг дууслаа! Таны цуглуулсан цэцгийн тоо: ${score}`);
+        }
+      }
+
+      function spawnFlower(flower) {
+        const maxX = (boardWidth - 20) / step;
+        const maxY = (boardHeight - 20) / step;
+        flower.x = Math.floor(Math.random() * maxX) * step;
+        flower.y = Math.floor(Math.random() * maxY) * step;
+
+        const flowerEl = document.getElementById(flower.id);
+        flowerEl.style.left = `${flower.x}px`;
+        flowerEl.style.top = `${flower.y}px`;
+      }
+
+      function checkCollision() {
+        flowers.forEach((flower) => {
+          if (
+            Math.abs(playerX - flower.x) < 15 &&
+            Math.abs(playerY - flower.y) < 15
+          ) {
+            score++;
+            scoreEl.innerText = score;
+            spawnFlower(flower);
+          }
+        });
+      }
+
+      function moveLeft() {
+        if (isGameOver) return;
+        playerX -= step;
+        if (playerX < 0) playerX = boardWidth - 20;
+        draw();
+      }
+
+      function moveRight() {
+        if (isGameOver) return;
+        playerX += step;
+        if (playerX > boardWidth - 20) playerX = 0;
+        draw();
+      }
+
+      function moveUp() {
+        if (isGameOver) return;
+        playerY -= step;
+        if (playerY < 0) playerY = boardHeight - 20;
+        draw();
+      }
+
+      function moveDown() {
+        if (isGameOver) return;
+        playerY += step;
+        if (playerY > boardHeight - 20) playerY = 0;
+        draw();
+      }
+
+      function draw() {
+        playerEl.style.left = `${playerX}px`;
+        playerEl.style.top = `${playerY}px`;
+        checkCollision();
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (
+          ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
+        ) {
+          e.preventDefault();
+        }
+        if (e.key === "ArrowLeft") moveLeft();
+        if (e.key === "ArrowRight") moveRight();
+        if (e.key === "ArrowUp") moveUp();
+        if (e.key === "ArrowDown") moveDown();
+      });
+
+      startGame();
+    </script>
+  </body>
+</html>
