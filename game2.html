@@ -76,7 +76,7 @@
           if (openIndex1 == -1) {
             openIndex1 = index;
           } else {
-            if (openIndex1 === index) {
+            if (openIndex1 !== index) {
               openIndex2 = index;
               if (cards[openIndex1] == cards[openIndex2]) {
                 console.log("same");
